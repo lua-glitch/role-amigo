@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Role Amigo — Encontros Casuais</title>
+  <meta name="description" content="Role Amigo — encontre pessoas com interesses em comum e marque encontros casuais." />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">RA</div>
+        <div>
+          <h1>Role Amigo</h1>
+          <p class="lead">Encontros casuais com gente que curte as mesmas coisas.</p>
+        </div>
+      </div>
+      <nav>
+        <button class="btn" id="open-create">+ Criar evento</button>
+        <button class="btn secondary" id="see-my-rsvps">Meus RSVPs</button>
+      </nav>
+    </header>
+
+    <section class="controls">
+      <div class="search">
+        <input type="search" id="search" placeholder="Buscar por nome, local ou descrição..." />
+        <select id="interest" class="select">
+          <option value="">Todos os interesses</option>
+          <option>Comida</option>
+          <option>Música</option>
+          <option>Esportes</option>
+          <option>Filmes</option>
+          <option>Jogos</option>
+        </select>
+      </div>
+      <div>
+        <button class="btn secondary" id="clear-filters">Limpar</button>
+      </div>
+    </section>
+
+    <div class="create-card" id="quick-create">
+      <div class="avatar">🙂</div>
+      <div style="flex:1">
+        <strong>Quer fazer um role agora?</strong>
+        <div style="font-size:13px;color:#475569">Crie um evento rápido e chame a galera.</div>
+      </div>
+      <button class="btn" id="open-create-2">Criar</button>
+    </div>
+
+    <main>
+      <div class="grid" id="events-grid">
+        <!-- cards serão injetados por JS -->
+      </div>
+    </main>
+
+    <footer>
+      <small>Role Amigo — feito com ❤️. Salve esse arquivo como <code>role-amigo.html</code> e abra no navegador.</small>
+    </footer>
+  </div>
+
+  <!-- Modal RSVP / Create -->
+  <div class="modal-backdrop" id="modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-body">
+        <button id="close-modal" style="float:right;background:none;border:0;font-size:18px;cursor:pointer">✕</button>
+        <h3 id="modal-title">Criar evento</h3>
+        <form id="event-form">
+          <div class="field">
+            <label for="evt-name">Nome do evento</label>
+            <input id="evt-name" required />
+          </div>
+          <div class="field">
+            <label for="evt-interest">Interesse</label>
+            <input id="evt-interest" placeholder="Ex: Música, Jogos, Comida" />
+          </div>
+          <div class="field">
+            <label for="evt-date">Data e hora</label>
+            <input id="evt-date" type="datetime-local" />
+          </div>
+          <div class="field">
+            <label for="evt-place">Local</label>
+            <input id="evt-place" />
+          </div>
+          <div class="field">
+            <label for="evt-img">URL da imagem (opcional)</label>
+            <input id="evt-img" placeholder="https://...jpg" />
+          </div>
+          <div class="field">
+            <label for="evt-desc">Descrição</label>
+            <textarea id="evt-desc" rows="4"></textarea>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn secondary" type="button" id="cancel-create">Cancelar</button>
+            <button class="btn" type="submit">Salvar evento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+<script src="script.js"></script>
+
+</body>
+</html>
