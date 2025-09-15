@@ -1,4 +1,4 @@
- // ====== Dados iniciais (exemplos) ======
+ 
     const sample = [
       {
         id: crypto.randomUUID(),
@@ -41,7 +41,7 @@
     let events = loadEvents();
     const grid = document.getElementById('events-grid');
 
-    // ====== Renderização ======
+    
     function render(list){
       grid.innerHTML = '';
       if(list.length===0){grid.innerHTML = '<p style="grid-column:1/-1;color:#475569">Nenhum evento encontrado. Crie o primeiro!</p>';return}
@@ -68,15 +68,15 @@
       })
     }
 
-    // ====== Utilities ======
+    
     function formatDate(iso){ if(!iso) return 'Sem data'; const d = new Date(iso); if(isNaN(d)) return iso; return d.toLocaleString(); }
     function escapeHtml(str){ if(!str) return ''; return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;') }
 
-    // ====== Modal behavior ======
+    
     const modal = document.getElementById('modal');
     const modalTitle = document.getElementById('modal-title');
     const form = document.getElementById('event-form');
-    let currentView = null; // {type:'create'|'view', id}
+    let currentView = null;
 
     function openModal(type, id){
       currentView = {type,id};
@@ -100,7 +100,7 @@
 
     modal.addEventListener('click', (e)=>{ if(e.target===modal) closeModal() })
 
-    // ====== Create / Save ======
+   
     function fillForm(data={}){
       document.getElementById('evt-name').value = data.title||'';
       document.getElementById('evt-interest').value = data.interest||'';
@@ -128,7 +128,6 @@
       closeModal();
     })
 
-    // ====== View details & RSVP ======
     function showDetails(id){
       const ev = events.find(x=>x.id===id);
       if(!ev){modal.querySelector('.modal-body').innerHTML = '<p>Evento não encontrado.</p>';return}
@@ -143,7 +142,7 @@
           <button class="btn" id="confirmRsvp">Quero ir</button>
         </div>
       `;
-      // re-wire close
+      
       document.getElementById('closeDetails').addEventListener('click', closeModal);
       document.getElementById('confirmRsvp').addEventListener('click', ()=>{
         rsvpToEvent(ev.id);
@@ -152,7 +151,7 @@
     }
 
     function rsvpToEvent(id){
-      // simples: armazenamos id de eventos confirmados no localStorage
+      
       const key = 'role-amigo-rsvps-v1';
       const raw = localStorage.getItem(key);
       let list = raw?JSON.parse(raw):[];
@@ -172,12 +171,12 @@
       const list = raw?JSON.parse(raw):[];
       if(list.length===0){alert('Você não confirmou presença em nenhum evento.') ;return}
       const myEvents = events.filter(e=>list.includes(e.id));
-      // mostrar rápido
+      
       render(myEvents);
       window.scrollTo({top:0,behavior:'smooth'});
     })
 
-    // ====== Delegation para botões dinâmicos ======
+
     grid.addEventListener('click',(e)=>{
       const btn = e.target.closest('button'); if(!btn) return;
       const action = btn.dataset.action; const id = btn.dataset.id;
@@ -185,7 +184,6 @@
       if(action==='rsvp') rsvpToEvent(id);
     })
 
-    // ====== Filtros ======
     const search = document.getElementById('search');
     const interest = document.getElementById('interest');
     const clear = document.getElementById('clear-filters');
@@ -206,5 +204,5 @@
     interest.addEventListener('change', applyFilters);
     clear.addEventListener('click', ()=>{search.value='';interest.value='';render(events)})
 
-    // ====== Inicial ======
+    
     render(events);
