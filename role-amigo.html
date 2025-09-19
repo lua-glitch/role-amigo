@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Role Amigo — Encontros Casuais</title>
   <meta name="description" content="Role Amigo — encontre pessoas com interesses em comum e marque encontros casuais." />
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
@@ -50,9 +50,7 @@
     </div>
 
     <main>
-      <div class="grid" id="events-grid">
-       
-      </div>
+      <div class="grid" id="events-grid"></div>
     </main>
 
     <footer>
@@ -62,43 +60,10 @@
 
   <div class="modal-backdrop" id="modal">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <div class="modal-body">
-        <button id="close-modal" style="float:right;background:none;border:0;font-size:18px;cursor:pointer">✕</button>
-        <h3 id="modal-title">Criar evento</h3>
-        <form id="event-form">
-          <div class="field">
-            <label for="evt-name">Nome do evento</label>
-            <input id="evt-name" required />
-          </div>
-          <div class="field">
-            <label for="evt-interest">Interesse</label>
-            <input id="evt-interest" placeholder="Ex: Música, Jogos, Comida" />
-          </div>
-          <div class="field">
-            <label for="evt-date">Data e hora</label>
-            <input id="evt-date" type="datetime-local" />
-          </div>
-          <div class="field">
-            <label for="evt-place">Local</label>
-            <input id="evt-place" />
-          </div>
-          <div class="field">
-            <label for="evt-img">URL da imagem (opcional)</label>
-            <input id="evt-img" placeholder="https://...jpg" />
-          </div>
-          <div class="field">
-            <label for="evt-desc">Descrição</label>
-            <textarea id="evt-desc" rows="4"></textarea>
-          </div>
-          <div style="display:flex;gap:8px;justify-content:flex-end">
-            <button class="btn secondary" type="button" id="cancel-create">Cancelar</button>
-            <button class="btn" type="submit">Salvar evento</button>
-          </div>
-        </form>
-      </div>
+      <div class="modal-body" id="modal-body"></div>
     </div>
   </div>
-<script src="script.js"></script>
-
+<script src="./script.js"></script>
 </body>
 </html>
+

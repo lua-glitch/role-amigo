@@ -1,208 +1,129 @@
- 
-    const sample = [
-      {
-        id: crypto.randomUUID(),
-        title: 'Barzinho e samba',
-        interest: 'Música',
-        datetime: '2025-09-20T20:00',
-        place: 'Bar do Zé',
-        img: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=60',
-        desc: 'Noite de samba, roda de amigos e caipirinha. Traga boa energia!'
-      },
-      {
-        id: crypto.randomUUID(),
-        title: 'Noite de games',
-        interest: 'Jogos',
-        datetime: '2025-09-18T19:30',
-        place: 'Casa do Pedro',
-        img: 'https://images.unsplash.com/photo-1605902711622-cfb43c44367e?auto=format&fit=crop&w=800&q=60',
-        desc: 'Sessão de jogos multiplayer: Mario Kart, Valorant e board games.'
-      },
-      {
-        id: crypto.randomUUID(),
-        title: 'Cine Pipoca',
-        interest: 'Filmes',
-        datetime: '2025-09-26T21:00',
-        place: 'CineClub',
-        img: 'https://images.unsplash.com/photo-1517604931442-7dcbf6fb9d9b?auto=format&fit=crop&w=800&q=60',
-        desc: 'Filme cult + pipoca grátis. Debate depois da sessão.'
-      }
-    ];
+const STORAGE_KEY = 'role-amigo-events-v2';
+let events = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 
-    // Local Storage helpers
-    const STORAGE_KEY = 'role-amigo-events-v1';
-    function loadEvents(){
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return sample.slice();
-      try{ return JSON.parse(raw)}catch(e){return sample.slice()}
-    }
-    function saveEvents(list){localStorage.setItem(STORAGE_KEY, JSON.stringify(list))}
+const grid = document.getElementById('events-grid');
+const modal = document.getElementById('modal');
+const modalBody = document.getElementById('modal-body');
 
-    let events = loadEvents();
-    const grid = document.getElementById('events-grid');
+function saveEvents() { localStorage.setItem(STORAGE_KEY, JSON.stringify(events)) }
 
-    
-    function render(list){
-      grid.innerHTML = '';
-      if(list.length===0){grid.innerHTML = '<p style="grid-column:1/-1;color:#475569">Nenhum evento encontrado. Crie o primeiro!</p>';return}
+function formatDate(iso) {
+    if (!iso) return 'Sem data';
+    const d = new Date(iso);
+    if (isNaN(d)) return iso;
+    return d.toLocaleString();
+}
 
-      list.forEach(ev => {
+function escapeHtml(str) { return str ? String(str).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;') : '' }
+
+function render(list = events) {
+    grid.innerHTML = '';
+    if (list.length === 0) { grid.innerHTML = '<p style="grid-column:1/-1;color:#475569">Nenhum evento encontrado.</p>'; return }
+    list.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+    list.forEach(ev => {
         const card = document.createElement('article');
         card.className = 'card';
         card.innerHTML = `
-          <img src="${ev.img || 'https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=800&q=60'}" alt="${escapeHtml(ev.title)}">
+          <img src="${ev.img || 'https://picsum.photos/400/200'}" alt="${escapeHtml(ev.title)}">
           <div class="content">
             <div class="meta">${formatDate(ev.datetime)} • ${escapeHtml(ev.place)}</div>
             <div class="title">${escapeHtml(ev.title)}</div>
-            <div class="desc">${escapeHtml(ev.desc||'Sem descrição.')}</div>
+            <div class="desc">${escapeHtml(ev.desc || 'Sem descrição.')}</div>
           </div>
           <div class="card-footer">
-            <div class="pill">${escapeHtml(ev.interest||'Geral')}</div>
+            <div class="pill">${escapeHtml(ev.interest || 'Geral')}</div>
             <div style="margin-left:auto;display:flex;gap:8px">
-              <button class="btn secondary" data-id="${ev.id}" data-action="view">Ver</button>
-              <button class="btn" data-id="${ev.id}" data-action="rsvp">Quero ir</button>
+              <button class="btn secondary" onclick="openModal('view','${ev.id}')">Ver</button>
+              <button class="btn secondary" onclick="openModal('edit','${ev.id}')">Editar</button>
+              <button class="btn secondary" onclick="deleteEvent('${ev.id}')">Excluir</button>
+              <button class="btn" onclick="rsvpToEvent('${ev.id}')">Quero ir</button>
             </div>
-          </div>
-        `;
+          </div>`;
         grid.appendChild(card);
-      })
-    }
-
-    
-    function formatDate(iso){ if(!iso) return 'Sem data'; const d = new Date(iso); if(isNaN(d)) return iso; return d.toLocaleString(); }
-    function escapeHtml(str){ if(!str) return ''; return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;') }
-
-    
-    const modal = document.getElementById('modal');
-    const modalTitle = document.getElementById('modal-title');
-    const form = document.getElementById('event-form');
-    let currentView = null;
-
-    function openModal(type, id){
-      currentView = {type,id};
-      modal.style.display = 'flex';
-      if(type==='create'){
-        modalTitle.textContent = 'Criar evento';
-        form.style.display = '';
-        fillForm();
-      }else{
-        modalTitle.textContent = 'Detalhes do evento';
-        form.style.display = 'none';
-        showDetails(id);
-      }
-    }
-
-    function closeModal(){ modal.style.display = 'none'; currentView = null }
-    document.getElementById('close-modal').addEventListener('click', closeModal);
-    document.getElementById('cancel-create').addEventListener('click', closeModal);
-    document.getElementById('open-create').addEventListener('click', ()=>openModal('create'));
-    document.getElementById('open-create-2').addEventListener('click', ()=>openModal('create'));
-
-    modal.addEventListener('click', (e)=>{ if(e.target===modal) closeModal() })
-
-   
-    function fillForm(data={}){
-      document.getElementById('evt-name').value = data.title||'';
-      document.getElementById('evt-interest').value = data.interest||'';
-      document.getElementById('evt-date').value = data.datetime||'';
-      document.getElementById('evt-place').value = data.place||'';
-      document.getElementById('evt-img').value = data.img||'';
-      document.getElementById('evt-desc').value = data.desc||'';
-    }
-
-    form.addEventListener('submit',(ev)=>{
-      ev.preventDefault();
-      const newEvt = {
-        id: crypto.randomUUID(),
-        title: document.getElementById('evt-name').value.trim(),
-        interest: document.getElementById('evt-interest').value.trim(),
-        datetime: document.getElementById('evt-date').value,
-        place: document.getElementById('evt-place').value.trim(),
-        img: document.getElementById('evt-img').value.trim(),
-        desc: document.getElementById('evt-desc').value.trim(),
-      };
-      if(!newEvt.title){alert('Informe um nome para o evento');return}
-      events.unshift(newEvt);
-      saveEvents(events);
-      render(events);
-      closeModal();
     })
+}
 
-    function showDetails(id){
-      const ev = events.find(x=>x.id===id);
-      if(!ev){modal.querySelector('.modal-body').innerHTML = '<p>Evento não encontrado.</p>';return}
-      modal.querySelector('.modal-body').innerHTML = `
-        <button id="close-modal" style="float:right;background:none;border:0;font-size:18px;cursor:pointer">✕</button>
-        <h3>${escapeHtml(ev.title)}</h3>
-        <img src="${ev.img||'https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=800&q=60'}" alt="" style="width:100%;height:200px;object-fit:cover;border-radius:8px;margin:10px 0">
-        <div class="meta">${formatDate(ev.datetime)} • ${escapeHtml(ev.place)}</div>
-        <p style="margin-top:8px">${escapeHtml(ev.desc)}</p>
-        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
-          <button class="btn secondary" id="closeDetails">Fechar</button>
-          <button class="btn" id="confirmRsvp">Quero ir</button>
-        </div>
-      `;
-      
-      document.getElementById('closeDetails').addEventListener('click', closeModal);
-      document.getElementById('confirmRsvp').addEventListener('click', ()=>{
-        rsvpToEvent(ev.id);
-      });
-      document.getElementById('close-modal').addEventListener('click', closeModal);
+function openModal(type, id = null) {
+    modal.style.display = 'flex';
+    if (type === 'create' || type === 'edit') {
+        const ev = id ? events.find(e => e.id === id) : {};
+        modalBody.innerHTML = `
+          <button onclick="closeModal()" style="float:right">✕</button>
+          <h3>${id ? 'Editar' : 'Criar'} evento</h3>
+          <form id="event-form">
+            <div class="field"><label>Nome</label><input id="evt-name" value="${escapeHtml(ev?.title || '')}" required></div>
+            <div class="field"><label>Interesse</label><input id="evt-interest" value="${escapeHtml(ev?.interest || '')}"></div>
+            <div class="field"><label>Data e hora</label><input type="datetime-local" id="evt-date" value="${ev?.datetime || ''}" required></div>
+            <div class="field"><label>Local</label><input id="evt-place" value="${escapeHtml(ev?.place || '')}"></div>
+            <div class="field"><label>Imagem URL</label><input id="evt-img" value="${escapeHtml(ev?.img || '')}"></div>
+            <div class="field"><label>Descrição</label><textarea id="evt-desc">${escapeHtml(ev?.desc || '')}</textarea></div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+              <button type="button" class="btn secondary" onclick="closeModal()">Cancelar</button>
+              <button class="btn" type="submit">Salvar</button>
+            </div>
+          </form>`;
+        document.getElementById('event-form').onsubmit = (e) => {
+            e.preventDefault();
+            const newEvt = {
+                id: id || crypto.randomUUID(),
+                title: document.getElementById('evt-name').value.trim(),
+                interest: document.getElementById('evt-interest').value.trim(),
+                datetime: document.getElementById('evt-date').value,
+                place: document.getElementById('evt-place').value.trim(),
+                img: document.getElementById('evt-img').value.trim(),
+                desc: document.getElementById('evt-desc').value.trim()
+            };
+            if (new Date(newEvt.datetime) < new Date()) { alert('Escolha uma data futura!'); return }
+            if (id) { events = events.map(e => e.id === id ? newEvt : e); } else { events.push(newEvt) }
+            saveEvents(); render(); closeModal();
+        }
     }
-
-    function rsvpToEvent(id){
-      
-      const key = 'role-amigo-rsvps-v1';
-      const raw = localStorage.getItem(key);
-      let list = raw?JSON.parse(raw):[];
-      if(list.includes(id)){
-        alert('Você já confirmou presença neste evento.');
-        return;
-      }
-      list.push(id);
-      localStorage.setItem(key, JSON.stringify(list));
-      alert('Presença confirmada!');
-      closeModal();
+    if (type === 'view') {
+        const ev = events.find(e => e.id === id);
+        modalBody.innerHTML = `
+          <button onclick="closeModal()" style="float:right">✕</button>
+          <h3>${escapeHtml(ev.title)}</h3>
+          <img src="${ev.img || 'https://picsum.photos/400/200'}" style="width:100%;border-radius:8px">
+          <div>${formatDate(ev.datetime)} • ${escapeHtml(ev.place)}</div>
+          <p>${escapeHtml(ev.desc)}</p>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+            <button class="btn secondary" onclick="closeModal()">Fechar</button>
+            <button class="btn" onclick="rsvpToEvent('${ev.id}')">Quero ir</button>
+          </div>`;
     }
+}
 
-    document.getElementById('see-my-rsvps').addEventListener('click', ()=>{
-      const key = 'role-amigo-rsvps-v1';
-      const raw = localStorage.getItem(key);
-      const list = raw?JSON.parse(raw):[];
-      if(list.length===0){alert('Você não confirmou presença em nenhum evento.') ;return}
-      const myEvents = events.filter(e=>list.includes(e.id));
-      
-      render(myEvents);
-      window.scrollTo({top:0,behavior:'smooth'});
-    })
+function closeModal() { modal.style.display = 'none' }
+function deleteEvent(id) { if (confirm('Excluir este evento?')) { events = events.filter(e => e.id !== id); saveEvents(); render() } }
 
+function rsvpToEvent(id) {
+    const key = 'role-amigo-rsvps';
+    const list = JSON.parse(localStorage.getItem(key) || '[]');
+    if (list.includes(id)) { alert('Já confirmado.'); return }
+    list.push(id); localStorage.setItem(key, JSON.stringify(list));
+    alert('Presença confirmada!');
+}
 
-    grid.addEventListener('click',(e)=>{
-      const btn = e.target.closest('button'); if(!btn) return;
-      const action = btn.dataset.action; const id = btn.dataset.id;
-      if(action==='view') openModal('view', id);
-      if(action==='rsvp') rsvpToEvent(id);
-    })
+document.getElementById('open-create').onclick = () => openModal('create');
+document.getElementById('open-create-2').onclick = () => openModal('create');
 
-    const search = document.getElementById('search');
-    const interest = document.getElementById('interest');
-    const clear = document.getElementById('clear-filters');
+document.getElementById('see-my-rsvps').onclick = () => {
+    const key = 'role-amigo-rsvps';
+    const list = JSON.parse(localStorage.getItem(key) || '[]');
+    render(events.filter(e => list.includes(e.id)))
+}
 
-    function applyFilters(){
-      const q = search.value.trim().toLowerCase();
-      const i = interest.value;
-      let result = events.filter(ev => {
-        const hay = (ev.title+' '+(ev.desc||'')+' '+(ev.place||'')).toLowerCase();
-        if(q && !hay.includes(q)) return false;
-        if(i && ev.interest !== i) return false;
-        return true;
-      })
-      render(result);
-    }
+document.getElementById('clear-filters').onclick = () => { document.getElementById('search').value = ''; document.getElementById('interest').value = ''; render() }
+document.getElementById('search').oninput = applyFilters;
+document.getElementById('interest').onchange = applyFilters;
 
-    search.addEventListener('input', applyFilters);
-    interest.addEventListener('change', applyFilters);
-    clear.addEventListener('click', ()=>{search.value='';interest.value='';render(events)})
+function applyFilters() {
+    const q = document.getElementById('search').value.toLowerCase();
+    const i = document.getElementById('interest').value;
+    render(events.filter(ev => {
+        const hay = (ev.title + ' ' + ev.desc + ' ' + ev.place).toLowerCase();
+        return (!q || hay.includes(q)) && (!i || ev.interest === i)
+    }));
+}
 
-    
-    render(events);
+render();
