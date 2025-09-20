@@ -11,7 +11,7 @@
 
  body {
      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-     background: #10141d;
+     background: #111620;
      color: #1f2937;
      line-height: 1.4
  }
@@ -39,11 +39,11 @@
      width: 56px;
      height: 56px;
      border-radius: 10px;
-     background: linear-gradient(135deg, #312863, #531153);
+     background: linear-gradient(135deg, #312863, #521452);
      display: flex;
      align-items: center;
      justify-content: center;
-     color: white;
+     color: rgb(255, 255, 255);
      font-weight: 700;
      font-size: 20px
  }
@@ -53,7 +53,7 @@
  }
 
  p.lead {
-     color: #7c8692
+     color: #a4b2c4
  }
 
  nav {
@@ -62,7 +62,7 @@
  }
 
  .btn {
-     background: #513e69;
+     background: #5b4575;
      color: rgb(255, 255, 255);
      padding: 8px 12px;
      border-radius: 8px;
@@ -72,7 +72,7 @@
 
  .btn.secondary {
      background: rgb(247, 242, 242);
-     border: 1px solid #0b121a;
+     border: 1px solid #0a111a;
      color: #000000
  }
 
@@ -99,7 +99,7 @@
  .select {
      padding: 10px;
      border-radius: 10px;
-     border: 1px solid #0f1824;
+     border: 1px solid #0f1620;
      background: white
  }
 
@@ -135,7 +135,7 @@
 
  .meta {
      font-size: 13px;
-     color: #3a495a;
+     color: #98b2cf;
      margin-bottom: 6px
  }
 
@@ -146,21 +146,21 @@
 
  .desc {
      font-size: 14px;
-     color: #5a6f8b;
+     color: #667b97;
      flex: 1
  }
 
  .card-footer {
-     display: flex;
-     gap: 8px;
+     display: grid;
+     gap: 12px;
      align-items: center;
      padding: 12px;
-     border-top: 1px solid #ffffff
+     border-top: 1px solid #e9e9e9
  }
 
  .pill {
      background: #ffffff;
-     color: #1e293b;
+     color: #162438;
      padding: 6px 10px;
      border-radius: 999px;
      font-size: 13px
@@ -169,7 +169,7 @@
  .modal-backdrop {
      position: fixed;
      inset: 0;
-     background: rgba(2, 6, 23, 0.45);
+     background: rgba(3, 7, 26, 0.45);
      display: none;
      align-items: center;
      justify-content: center;
@@ -216,7 +216,7 @@
      gap: 12px;
      align-items: center;
      padding: 12px;
-     background: linear-gradient(90deg, #fff7ed, #fef3c7);
+     background: linear-gradient(90deg, #2c2142, #0b0931);
      border-radius: 12px;
      margin-top: 20px
  }
@@ -225,7 +225,7 @@
      width: 58px;
      height: 58px;
      border-radius: 8px;
-     background: #ffeac7;
+     background: #494561;
      display: flex;
      align-items: center;
      justify-content: center;
@@ -234,7 +234,7 @@
 
  footer {
      margin-top: 30px;
-     color: #64748b;
+     color: #abc1df;
      font-size: 13px;
      text-align: center
  }
